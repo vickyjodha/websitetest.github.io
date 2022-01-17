@@ -1,6 +1,6 @@
 Thanks for downloading this template!
 
-Template Name: Flattern
-Template URL: https://bootstrapmade.com/flattern-multipurpose-bootstrap-template/
+Template Name: Jodhapri safa sherwani
+Template URL: 
 Author: BootstrapMade.com
-License: https://bootstrapmade.com/license/
+License: 
