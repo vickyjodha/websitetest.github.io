@@ -1,200 +1,301 @@
-(function() {
-    "use strict";
-    /**
-     * Easy selector helper function
-     */
-    const select=(el, all=false)=> {
-        el=el.trim() if (all) {
-            return [...document.querySelectorAll(el)]
-        }
-        else {
-            return document.querySelector(el)
-        }
-    }
-    /**
-     * Easy event listener function
-     */
-    const on=(type, el, listener, all=false)=> {
-        let selectEl=select(el, all) if (selectEl) {
-            if (all) {
-                selectEl.forEach(e=> e.addEventListener(type, listener))
-            }
-            else {
-                selectEl.addEventListener(type, listener)
-            }
-        }
-    }
-    /**
-     * Easy on scroll event listener 
-     */
-    const onscroll=(el, listener)=> {
-        el.addEventListener('scroll', listener)
-    }
-    /**
-     * Scrolls to an element with header offset
-     */
-    const scrollto=(el)=> {
-        let header=select('#header') let offset=header.offsetHeight if (!header.classList.contains('header-scrolled')) {
-            offset -=16
-        }
-        let elementPos=select(el).offsetTop window.scrollTo( {
-            top: elementPos - offset, behavior: 'smooth'
-        }
-        )
-    }
-    /**
-     * Header fixed top on scroll
-     */
-    let selectHeader=select('#header') if (selectHeader) {
-        let headerOffset=selectHeader.offsetTop let nextElement=selectHeader.nextElementSibling const headerFixed=()=> {
-            if ((headerOffset - window.scrollY) <=0) {
-                selectHeader.classList.add('fixed-top') nextElement.classList.add('scrolled-offset')
-            }
-            else {
-                selectHeader.classList.remove('fixed-top') nextElement.classList.remove('scrolled-offset')
-            }
-        }
-        window.addEventListener('load', headerFixed) onscroll(document, headerFixed)
-    }
-    /**
-     * Back to top button
-     */
-    let backtotop=select('.back-to-top') if (backtotop) {
-        const toggleBacktotop=()=> {
-            if (window.scrollY > 100) {
-                backtotop.classList.add('active')
-            }
-            else {
-                backtotop.classList.remove('active')
-            }
-        }
-        window.addEventListener('load', toggleBacktotop) onscroll(document, toggleBacktotop)
-    }
-    /**
-     * Mobile nav toggle
-     */
-    on('click', '.mobile-nav-toggle', function(e) {
-        select('#navbar').classList.toggle('navbar-mobile') this.classList.toggle('bi-list') this.classList.toggle('bi-x')
-    }
-    )
-    /**
-     * Mobile nav dropdowns activate
-     */
-    on('click', '.navbar .dropdown > a', function(e) {
-        if (select('#navbar').classList.contains('navbar-mobile')) {
-            e.preventDefault() this.nextElementSibling.classList.toggle('dropdown-active')
-        }
-    }
-    , true)
-    /**
-     * Scrool with ofset on links with a class name .scrollto
-     */
-    on('click', '.scrollto', function(e) {
-        if (select(this.hash)) {
-            e.preventDefault() let navbar=select('#navbar') if (navbar.classList.contains('navbar-mobile')) {
-                navbar.classList.remove('navbar-mobile') let navbarToggle=select('.mobile-nav-toggle') navbarToggle.classList.toggle('bi-list') navbarToggle.classList.toggle('bi-x')
-            }
-            scrollto(this.hash)
-        }
-    }
-    , true)
-    /**
-     * Scroll with ofset on page load with hash links in the url
-     */
-    window.addEventListener('load', ()=> {
-        if (window.location.hash) {
-            if (select(window.location.hash)) {
-                scrollto(window.location.hash)
-            }
-        }
-    }
-    );
-    /**
-     * Hero carousel indicators
-     */
-    let heroCarouselIndicators=select("#hero-carousel-indicators") let heroCarouselItems=select('#heroCarousel .carousel-item', true) heroCarouselItems.forEach((item, index)=> {
-        (index===0) ? heroCarouselIndicators.innerHTML +="<li data-bs-target='#heroCarousel' data-bs-slide-to='" + index + "' class='active'></li>": heroCarouselIndicators.innerHTML +="<li data-bs-target='#heroCarousel' data-bs-slide-to='" + index + "'></li>"
-    }
-    );
-    /**
-     * Skills animation
-     */
-    let skilsContent=select('.skills-content');
-    if (skilsContent) {
-        new Waypoint( {
-            element: skilsContent, offset: '80%', handler: function(direction) {
-                let progress=select('.progress .progress-bar', true);
-                progress.forEach((el)=> {
-                    el.style.width=el.getAttribute('aria-valuenow') + '%'
-                }
-                );
-            }
-        }
-        )
-    }
-    /**
-     * Porfolio isotope and filter
-     */
-    window.addEventListener('load', ()=> {
-        let portfolioContainer=select('.portfolio-container');
-        if (portfolioContainer) {
-            let portfolioIsotope=new Isotope(portfolioContainer, {
-                itemSelector: '.portfolio-item', layoutMode: 'fitRows'
-            }
-            );
-            let portfolioFilters=select('#portfolio-flters li', true);
-            on('click', '#portfolio-flters li', function(e) {
-                e.preventDefault();
-                portfolioFilters.forEach(function(el) {
-                    el.classList.remove('filter-active');
-                }
-                );
-                this.classList.add('filter-active');
-                portfolioIsotope.arrange( {
-                    filter: this.getAttribute('data-filter')
-                }
-                );
-                portfolioIsotope.on('arrangeComplete', function() {
-                    AOS.refresh()
-                }
-                );
-            }
-            , true);
-        }
-    }
-    );
-    /**
-     * Initiate portfolio lightbox 
-     */
-    const portfolioLightbox=GLightbox( {
-        selector: '.portfolio-lightbox'
-    }
-    );
-    /**
-     * Portfolio details slider
-     */
-    new Swiper('.portfolio-details-slider', {
-        speed: 400, loop: true, autoplay: {
-            delay: 5000, disableOnInteraction: false
-        }
-        , pagination: {
-            el: '.swiper-pagination', type: 'bullets', clickable: true
-        }
-    }
-    );
-    /**
-     * Animation on scroll
-     */
-    window.addEventListener('load', ()=> {
-        AOS.init( {
-            duration: 1000, easing: 'ease-in-out', once: true, mirror: false
-        }
-        )
-    }
-    );
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+
+body {
+    font-family: "Open Sans", sans-serif;
+    color: #4d4643;
 }
 
-)() * Mobile Navigation */ .mobile-nav-toggle {
+a {
+    color: #f03c02;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #fd5c28;
+    text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Muli", sans-serif;
+}
+
+
+/*--------------------------------------------------------------
+# Back to top button
+--------------------------------------------------------------*/
+
+.back-to-top {
+    position: fixed;
+    visibility: hidden;
+    opacity: 0;
+    right: 15px;
+    bottom: 15px;
+    z-index: 996;
+    background: #f03c02;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    transition: all 0.4s;
+}
+
+.back-to-top i {
+    font-size: 28px;
+    color: #fff;
+    line-height: 0;
+}
+
+.back-to-top:hover {
+    background: #fd541e;
+    color: #fff;
+}
+
+.back-to-top.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/*--------------------------------------------------------------
+# Disable AOS delay on mobile
+--------------------------------------------------------------*/
+
+@media screen and (max-width: 768px) {
+    [data-aos-delay] {
+        transition-delay: 0 !important;
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Top Bar
+--------------------------------------------------------------*/
+
+#topbar {
+    background: #f8f6f5;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+#topbar .contact-info i {
+    font-style: normal;
+    color: #f03c02;
+}
+
+#topbar .contact-info i a,
+#topbar .contact-info i span {
+    padding-left: 5px;
+    color: #2b2320;
+}
+
+#topbar .contact-info i a {
+    line-height: 0;
+    transition: 0.3s;
+}
+
+#topbar .contact-info i a:hover {
+    color: #f03c02;
+}
+
+#topbar .social-links a {
+    color: #65534c;
+    line-height: 0;
+    transition: 0.3s;
+    margin-left: 15px;
+}
+
+#topbar .social-links a:hover {
+    color: #f03c02;
+}
+
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+
+#header {
+    height: 70px;
+    transition: all 0.5s;
+    z-index: 997;
+    transition: all 0.5s;
+    background: #fff;
+}
+
+#header.fixed-top {
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+}
+
+#header .logo h1 {
+    font-size: 28px;
+    margin: 0;
+    padding: 10px 0;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#header .logo h1 a,
+#header .logo h1 a:hover {
+    color: #2b2320;
+    text-decoration: none;
+}
+
+#header .logo img {
+    padding: 0;
+    margin: 0;
+    max-height: 40px;
+}
+
+.scrolled-offset {
+    margin-top: 70px;
+}
+
+
+/*--------------------------------------------------------------
+# Navigation Menu
+--------------------------------------------------------------*/
+
+
+/**
+* Desktop Navigation 
+*/
+
+.navbar {
+    padding: 0;
+}
+
+.navbar ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    list-style: none;
+    align-items: center;
+}
+
+.navbar li {
+    position: relative;
+}
+
+.navbar a,
+.navbar a:focus {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0 10px 20px;
+    font-size: 13px;
+    color: #65534c;
+    white-space: nowrap;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.navbar a i,
+.navbar a:focus i {
+    font-size: 12px;
+    line-height: 0;
+    margin-left: 5px;
+}
+
+.navbar a:hover,
+.navbar .active,
+.navbar .active:focus,
+.navbar li:hover>a {
+    color: #f03c02;
+}
+
+.navbar .getstarted,
+.navbar .getstarted:focus {
+    background: #f03c02;
+    padding: 8px 20px;
+    margin-left: 30px;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.navbar .getstarted:hover,
+.navbar .getstarted:focus:hover {
+    color: #fff;
+    background: #fd490f;
+}
+
+.navbar .dropdown ul {
+    display: block;
+    position: absolute;
+    left: 14px;
+    top: calc(100% + 30px);
+    margin: 0;
+    padding: 10px 0;
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    background: #fff;
+    box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
+    transition: 0.3s;
+}
+
+.navbar .dropdown ul li {
+    min-width: 200px;
+}
+
+.navbar .dropdown ul a {
+    padding: 10px 20px;
+    font-size: 13px;
+    text-transform: none;
+    font-weight: 500;
+    color: #581601;
+}
+
+.navbar .dropdown ul a i {
+    font-size: 12px;
+}
+
+.navbar .dropdown ul a:hover,
+.navbar .dropdown ul .active:hover,
+.navbar .dropdown ul li:hover>a {
+    color: #f03c02;
+}
+
+.navbar .dropdown:hover>ul {
+    opacity: 1;
+    top: 100%;
+    visibility: visible;
+}
+
+.navbar .dropdown .dropdown ul {
+    top: 0;
+    left: calc(100% - 30px);
+    visibility: hidden;
+}
+
+.navbar .dropdown .dropdown:hover>ul {
+    opacity: 1;
+    top: 0;
+    left: 100%;
+    visibility: visible;
+}
+
+@media (max-width: 1366px) {
+    .navbar .dropdown .dropdown ul {
+        left: -90%;
+    }
+    .navbar .dropdown .dropdown:hover>ul {
+        left: -100%;
+    }
+}
+
+
+/**
+* Mobile Navigation 
+*/
+
+.mobile-nav-toggle {
     color: #2b2320;
     font-size: 28px;
     cursor: pointer;
