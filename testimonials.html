@@ -1,60 +1,274 @@
-(function() { "use strict"; /** * Easy selector helper function */ const select = (el, all = false) => { el = el.trim() if (all) { return [...document.querySelectorAll(el)] } else { return document.querySelector(el) } } /** * Easy event listener function
-*/ const on = (type, el, listener, all = false) => { let selectEl = select(el, all) if (selectEl) { if (all) { selectEl.forEach(e => e.addEventListener(type, listener)) } else { selectEl.addEventListener(type, listener) } } } /** * Easy on scroll event
-listener */ const onscroll = (el, listener) => { el.addEventListener('scroll', listener) } /** * Scrolls to an element with header offset */ const scrollto = (el) => { let header = select('#header') let offset = header.offsetHeight if (!header.classList.contains('header-scrolled'))
-{ offset -= 16 } let elementPos = select(el).offsetTop window.scrollTo({ top: elementPos - offset, behavior: 'smooth' }) } /** * Header fixed top on scroll */ let selectHeader = select('#header') if (selectHeader) { let headerOffset = selectHeader.offsetTop
-let nextElement = selectHeader.nextElementSibling const headerFixed = () => { if ((headerOffset - window.scrollY)
-<=0 ) { selectHeader.classList.add( 'fixed-top') nextElement.classList.add( 'scrolled-offset') } else { selectHeader.classList.remove(
-    'fixed-top') nextElement.classList.remove( 'scrolled-offset') } } window.addEventListener( 'load', headerFixed) onscroll(document, headerFixed) } /** * Back to top button */ let backtotop=s elect( '.back-to-top') if (backtotop) { const toggleBacktotop=( )=> { if (window.scrollY > 100) { backtotop.classList.add('active') } else { backtotop.classList.remove('active') } } window.addEventListener('load', toggleBacktotop) onscroll(document, toggleBacktotop) } /** * Mobile nav toggle */ on('click', '.mobile-nav-toggle',
-    function(e) { select('#navbar').classList.toggle('navbar-mobile') this.classList.toggle('bi-list') this.classList.toggle('bi-x') }) /** * Mobile nav dropdowns activate */ on('click', '.navbar .dropdown > a', function(e) { if (select('#navbar').classList.contains('navbar-mobile'))
-    { e.preventDefault() this.nextElementSibling.classList.toggle('dropdown-active') } }, true) /** * Scrool with ofset on links with a class name .scrollto */ on('click', '.scrollto', function(e) { if (select(this.hash)) { e.preventDefault() let navbar
-    = select('#navbar') if (navbar.classList.contains('navbar-mobile')) { navbar.classList.remove('navbar-mobile') let navbarToggle = select('.mobile-nav-toggle') navbarToggle.classList.toggle('bi-list') navbarToggle.classList.toggle('bi-x') } scrollto(this.hash)
-    } }, true) /** * Scroll with ofset on page load with hash links in the url */ window.addEventListener('load', () => { if (window.location.hash) { if (select(window.location.hash)) { scrollto(window.location.hash) } } }); /** * Hero carousel indicators
-    */ let heroCarouselIndicators = select("#hero-carousel-indicators") let heroCarouselItems = select('#heroCarousel .carousel-item', true) heroCarouselItems.forEach((item, index) => { (index === 0) ? heroCarouselIndicators.innerHTML += "
-    <li data-bs-target='#heroCarousel'
-        data-bs-slide-to='" + index + "' class='active'></li>": heroCarouselIndicators.innerHTML += "
-    <li data-bs-target='#heroCarousel' data-bs-slide-to='" + index + "'></li>" }); /** * Skills animation */ let skilsContent = select('.skills-content'); if (skilsContent) { new Waypoint({ element: skilsContent, offset: '80%', handler: function(direction) { let progress = select('.progress .progress-bar', true); progress.forEach((el)
-    => { el.style.width = el.getAttribute('aria-valuenow') + '%' }); } }) } /** * Porfolio isotope and filter */ window.addEventListener('load', () => { let portfolioContainer = select('.portfolio-container'); if (portfolioContainer) { let portfolioIsotope
-    = new Isotope(portfolioContainer, { itemSelector: '.portfolio-item', layoutMode: 'fitRows' }); let portfolioFilters = select('#portfolio-flters li', true); on('click', '#portfolio-flters li', function(e) { e.preventDefault(); portfolioFilters.forEach(function(el)
-    { el.classList.remove('filter-active'); }); this.classList.add('filter-active'); portfolioIsotope.arrange({ filter: this.getAttribute('data-filter') }); portfolioIsotope.on('arrangeComplete', function() { AOS.refresh() }); }, true); } }); /** * Initiate
-    portfolio lightbox */ const portfolioLightbox = GLightbox({ selector: '.portfolio-lightbox' }); /** * Portfolio details slider */ new Swiper('.portfolio-details-slider', { speed: 400, loop: true, autoplay: { delay: 5000, disableOnInteraction: false
-    }, pagination: { el: '.swiper-pagination', type: 'bullets', clickable: true } }); /** * Animation on scroll */ window.addEventListener('load', () => { AOS.init({ duration: 1000, easing: 'ease-in-out', once: true, mirror: false }) }); })()
-    <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
-    <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
-    <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
-    <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
-    </ul>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="col-lg-4 col-md-6 footer-newsletter">
-        <h4>Join Our Newsletter</h4>
-        <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-        <form action="" method="post">
-            <input type="email" name="email"><input type="submit" value="Subscribe">
-        </form>
-    </div>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    </div>
-    </div>
-    </div>
+    <title>Testimonials - Flattern Bootstrap Template</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
 
-    <div class="container d-md-flex py-4">
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-        <div class="me-md-auto text-center text-md-start">
-            <div class="copyright">
-                &copy; Copyright <strong><span>Flattern</span></strong>. All Rights Reserved
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Muli:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- ======= Top Bar ======= -->
+    <section id="topbar" class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center justify-content-md-between">
+            <div class="contact-info d-flex align-items-center">
+                <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">contact@example.com</a></i>
+                <i class="bi bi-phone d-flex align-items-center ms-4"><span>+1 5589 55488 55</span></i>
             </div>
-            <div class="credits">
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            <div class="social-links d-none d-md-flex align-items-center">
+                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
             </div>
         </div>
-        <div class="social-links text-center text-md-right pt-3 pt-md-0">
-            <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-            <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-            <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-            <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+    </section>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="d-flex align-items-center">
+        <div class="container d-flex justify-content-between">
+
+            <div class="logo">
+                <h1 class="text-light"><a href="index.html">Jodhapuri safa sherwani</a></h1>
+            </div>
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="active" href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="services.html">safa</a></li>
+                    <li><a href="testimonials.html">Sherwani</a></li>
+                    <li><a href="pricing.html">Binota</a></li>
+                    <!-- <li><a href="portfolio.html">Portfolio</a></li> -->
+                    <!-- <li><a href="blog.html">Blog</a></li> -->
+                    <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+                        <ul>
+                            <li><a href="#">Drop Down 1</a></li>
+                            <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
+                                <ul>
+                                    <li><a href="#">Deep Drop Down 1</a></li>
+                                    <li><a href="#">Deep Drop Down 2</a></li>
+                                    <li><a href="#">Deep Drop Down 3</a></li>
+                                    <li><a href="#">Deep Drop Down 4</a></li>
+                                    <li><a href="#">Deep Drop Down 5</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Drop Down 2</a></li>
+                            <li><a href="#">Drop Down 3</a></li>
+                            <li><a href="#">Drop Down 4</a></li>
+                        </ul>
+                    </li> -->
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav>
+            <!-- .navbar -->
+
         </div>
-    </div>
+    </header>
+    <!-- End Header -->
+
+    <main id="main">
+
+        <!-- ======= Breadcrumbs ======= -->
+        <section id="breadcrumbs" class="breadcrumbs">
+            <div class="container">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Testimonials</h2>
+                    <ol>
+                        <li><a href="index.html">Home</a></li>
+                        <li>Testimonials</li>
+                    </ol>
+                </div>
+
+            </div>
+        </section>
+        <!-- End Breadcrumbs -->
+
+        <!-- ======= Testimonials Section ======= -->
+        <section id="testimonials" class="testimonials">
+            <div class="container">
+
+                <div class="row">
+
+                    <div class="col-lg-6" data-aos="fade-up">
+                        <div class="testimonial-item">
+                            <img src="assets/img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
+                            <h3>Saul Goodman</h3>
+                            <h4>Ceo &amp; Founder</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Proin iaculis purus consequat sem cure digni ssim donec porttitora entum suscipit rhoncus. Accusantium quam, ultricies eget id, aliquam eget nibh et. Maecen aliquam,
+                                risus at semper.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="testimonial-item mt-4 mt-lg-0">
+                            <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
+                            <h3>Sara Wilsson</h3>
+                            <h4>Designer</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid cillum eram malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet
+                                legam anim culpa.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="testimonial-item mt-4">
+                            <img src="assets/img/testimonials/testimonials-3.jpg" class="testimonial-img" alt="">
+                            <h3>Jena Karlis</h3>
+                            <h4>Store Owner</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Enim nisi quem export duis labore cillum quae magna enim sint quorum nulla quem veniam duis minim tempor labore quem eram duis noster aute amet eram fore quis sint minim.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="testimonial-item mt-4">
+                            <img src="assets/img/testimonials/testimonials-4.jpg" class="testimonial-img" alt="">
+                            <h3>Matt Brandon</h3>
+                            <h4>Freelancer</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Fugiat enim eram quae cillum dolore dolor amet nulla culpa multos export minim fugiat minim velit minim dolor enim duis veniam ipsum anim magna sunt elit fore quem dolore
+                                labore illum veniam.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                        <div class="testimonial-item mt-4">
+                            <img src="assets/img/testimonials/testimonials-5.jpg" class="testimonial-img" alt="">
+                            <h3>John Larson</h3>
+                            <h4>Entrepreneur</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Quis quorum aliqua sint quem legam fore sunt eram irure aliqua veniam tempor noster veniam enim culpa labore duis sunt culpa nulla illum cillum fugiat legam esse veniam
+                                culpa fore nisi cillum quid.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
+                        <div class="testimonial-item mt-4">
+                            <img src="assets/img/testimonials/testimonials-6.jpg" class="testimonial-img" alt="">
+                            <h3>Emily Harison</h3>
+                            <h4>Store Owner</h4>
+                            <p>
+                                <i class="bx bxs-quote-alt-left quote-icon-left"></i> Eius ipsam praesentium dolor quaerat inventore rerum odio. Quos laudantium adipisci eius. Accusamus qui iste cupiditate sed temporibus est aspernatur. Sequi officiis
+                                ea et quia quidem.
+                                <i class="bx bxs-quote-alt-right quote-icon-right"></i>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+        <!-- End Testimonials Section -->
+
+    </main>
+    <!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-3 col-md-6 footer-contact">
+                        <h3>Flattern</h3>
+                        <p>
+                            A108 Adam Street <br> New York, NY 535022<br> United States <br><br>
+                            <strong>Phone:</strong> +1 5589 55488 55<br>
+                            <strong>Email:</strong> info@example.com<br>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 footer-links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Our Services</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Web Design</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-newsletter">
+                        <h4>Join Our Newsletter</h4>
+                        <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                        <form action="" method="post">
+                            <input type="email" name="email"><input type="submit" value="Subscribe">
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container d-md-flex py-4">
+
+            <div class="me-md-auto text-center text-md-start">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>Flattern</span></strong>. All Rights Reserved
+                </div>
+                <div class="credits">
+                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                </div>
+            </div>
+            <div class="social-links text-center text-md-right pt-3 pt-md-0">
+                <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+                <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
+                <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+                <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
+                <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+        </div>
     </footer>
     <!-- End Footer -->
 
@@ -72,6 +286,6 @@ let nextElement = selectHeader.nextElementSibling const headerFixed = () => { if
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
 
-    </body>
+</body>
 
-    </html>
+</html>
